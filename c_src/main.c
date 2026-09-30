@@ -58,14 +58,6 @@ enum GameState { // -> next best move
   NoAction = 27,
 };
 
-uint64_t uuid_hash(char input_s[32]) {
-    uint64_t acc = 237631;
-    for (int i = 31; i >= 0; i-- ) {
-        acc += ((input_s[i] ^ i) ^ acc);
-    }
-    return acc;
-}
-
 int main(int argc, char *argv[]) {
     // this uint8_t stores the next best action index
     const enum GameState node_tree[27] = {
@@ -78,23 +70,12 @@ int main(int argc, char *argv[]) {
     };
 
     if (argc == 2) {
-        printf("CLI debugging mode enabled. Input first State: \n");
+        printf("Raw debugging mode enabled. Input first State as a number: \n");
 
         while(1) {
-            char input_s[32];
-            fgets(input_s, 32, stdin);
-
-            uint64_t hash_result = uuid_hash(input_s);
-            switch (hash_result) {
-                case 1020524304315563: {
-
-                    break;
-                }
-                default: {
-                    printf("State uuid_hash undefined: %lu", hash_result);
-                    break;
-                }
-            }
+            int input_s;
+            scanf("%d", &input_s);
+            printf("%d\n", node_tree[input_s]);
         }
 
     } else {
