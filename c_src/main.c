@@ -58,9 +58,9 @@ enum GameState { // -> next best move
   NoAction = 27,
 };
 
-uint64_t uuid_hash(char input_s[64]) {
+uint64_t uuid_hash(char input_s[32]) {
     uint64_t acc = 237631;
-    for (int i = 64; i > 0; i-- ) {
+    for (int i = 31; i >= 0; i-- ) {
         acc += ((input_s[i] ^ i) ^ acc);
     }
     return acc;
@@ -78,17 +78,22 @@ int main(int argc, char *argv[]) {
     };
 
     if (argc == 2) {
-        printf("CLI debugging mode enabled. -h for steps, Input first State: \n");
-
-        //uint64_t state_uuids[27] = {};
-        const uint64_t state0 = uuid_hash("Kcheck");
+        printf("CLI debugging mode enabled. Input first State: \n");
 
         while(1) {
-            char input_s[64];
-            fgets(input_s, 64, stdin);
+            char input_s[32];
+            fgets(input_s, 32, stdin);
+
             uint64_t hash_result = uuid_hash(input_s);
-            if (hash_result == state0) {
-                break;
+            switch (hash_result) {
+                case 1020524304315563: {
+
+                    break;
+                }
+                default: {
+                    printf("State uuid_hash undefined: %lu", hash_result);
+                    break;
+                }
             }
         }
 
