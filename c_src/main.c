@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -57,7 +58,15 @@ enum GameState { // -> next best move
   NoAction = 27,
 };
 
-int main() {
+uint64_t uuid_hash(char input_s[64]) {
+    uint64_t acc = 237631;
+    for (int i = 64; i > 0; i-- ) {
+        acc += ((input_s[i] ^ i) ^ acc);
+    }
+    return acc;
+}
+
+int main(int argc, char *argv[]) {
     // this uint8_t stores the next best action index
     const enum GameState node_tree[27] = {
         KCheck, KCheckBet, KBetCall, KCheckBetCall,
@@ -68,21 +77,38 @@ int main() {
         NoAction, NoAction, NoAction, NoAction, NoAction,
     };
 
-    FILE* fptr;
+    if (argc == 2) {
+        printf("CLI debugging mode enabled. -h for steps, Input first State: \n");
 
-    fptr = fopen("../temp.swp", "r");
+        //uint64_t state_uuids[27] = {};
+        const uint64_t state0 = uuid_hash("Kcheck");
 
-    if (fptr == NULL) {
-        printf("Error openning file!");
+        while(1) {
+            char input_s[64];
+            fgets(input_s, 64, stdin);
+            uint64_t hash_result = uuid_hash(input_s);
+            if (hash_result == state0) {
+                break;
+            }
+        }
+
     } else {
-        fclose(fptr);
-    }
+        FILE* fptr;
+
+        fptr = fopen("../temp.swp", "r");
+
+        if (fptr == NULL) {
+            printf("Error openning file!");
+        } else {
+            fclose(fptr);
+        }
 
 
-    printf("The C interface is running, press control+c to kill it.\n");
-    while (1) {
-        usleep(1000000);
-        break;
+        printf("The C interface is running, press control+c to kill it.\n");
+        while (1) {
+            usleep(1000000);
+            break;
+        }
     }
 
     return 0;
