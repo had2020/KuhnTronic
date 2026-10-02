@@ -26,11 +26,19 @@ public class Main {
     public static void main(String[] args) {
         Scanner scnr = new Scanner(System.in);
 
-        System.out.println("Input the move Call, Fold, or Call");
+        System.out.println("Input the move Call, Fold, Check or Bet");
         String move = scnr.next();
 
         if (move.contentEquals("Call")) { // PLEASE DO NOT USE REGULAR EQUALITY CHECKS ON STRINGS. MUST USE CONTENTEQUALS()
             System.out.println("You called");
+        } else if (move.contentEquals("Fold")) {
+            System.out.println("You Folded");
+        } else if (move.contentEquals("Check")) {
+            System.out.println("You Checked");
+        } else if (move.contentEquals("Bet")) {
+            System.out.println("You Bet");
+        }
+
         }
 
         scnr.close();
