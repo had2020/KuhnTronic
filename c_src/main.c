@@ -21,6 +21,7 @@
     BetCall = 8,      // "BC"  -> Showdown (Pot: 4) | Winner: High card (P1 if C1 > C2, else P2)
 */
 
+// TODO redesign for Leduc Hold'em Poker
 enum GameState { // -> next best move
   KEmpty = 0, // -> KCheck
   KCheck = 1, // -> KCheckBet
