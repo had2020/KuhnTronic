@@ -5,7 +5,7 @@
 #include <time.h>
 #include "time.h"
 #include <unistd.h>
-#include "ml.c"
+#include "nnet.c"
 
 /* A node can be best thought of as this:
     Possible Card states: K=2, Q=1, J=0;
@@ -62,8 +62,6 @@ enum GameState { // -> next best move
 };
 
 int main(int argc, char *argv[]) {
-
-    exp(5.5);
 
     // this uint8_t stores the next best action index
     const enum GameState node_tree[27] = {
