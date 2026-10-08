@@ -15,7 +15,27 @@ int main(int argc, char *argv[]) {
 
     struct dataset dataset = {};
 
-    dataset.training_inputs = {{0,0,0,0}};
+    /*
+    struct dataset.training_inputs = {
+        {0.0f, 0.0f},
+        {1.0f, 0.0f},
+        {0.0f, 1.0f},
+        {1.0f, 1.0f}
+    };*/
+
+    // Training for XOR
+    double training_inputs[numTrainingSets][numInputs] = {
+        {0.0f, 0.0f},
+        {1.0f, 0.0f},
+        {0.0f, 1.0f},
+        {1.0f, 1.0f}
+    };
+    **dataset.training_inputs = **training_inputs;
+
+    for (int i = 0; i < numTrainingSets; i++ ) {
+        printf("idx: [%d] = %f", i, dataset.training_inputs[1][i]);
+    }
+
 
     if (argc == 2) {
         printf("Raw debugging mode enabled. Input first State as a number: \n");
