@@ -1,6 +1,8 @@
+#include <array>
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <vector>
 
 double fast_exp(double x) {
     const double LN2_HI = 0.6931471805599453;
@@ -48,7 +50,7 @@ double dSigmoid(double x) {return x * (1 - x); } // Derivative
 
 double init_weights() { return ((double)rand()) / ((double)RAND_MAX); }
 
-void shuffle(int *array, size_t n) {
+void shuffle(std::vector<int> array, size_t n) {
     if (n > 1) {
         size_t i;
         for (i = 0; i < n-1; i++) {
@@ -61,14 +63,16 @@ void shuffle(int *array, size_t n) {
 }
 
 #define numInputs 4
-#define numHiddenNodes 4
+#define numHiddenNodes 8
 #define numOuputs 1
-#define numTrainingSets 1
+//#define numTrainingSets 4
 
-// TODO put on the heap
+//TODO optimize for a more DoD structure
 struct dataset {
-    double training_inputs[numTrainingSets][numInputs];
-    double training_outputs[numTrainingSets][numInputs];
+    //double training_inputs[numTrainingSets][numInputs];
+    //double training_outputs[numTrainingSets][numOutputs];
+    std::vector<std::array<double, numInputs>> training_inputs;
+    std::vector<std::array<double, numOuputs>> training_outputs;
 };
 
 struct Model {
@@ -102,7 +106,10 @@ void init(struct Model model) {
 
 // learningRate works at 0.1
 void train(uint64_t numEpochs, double learningRate, struct Model model, struct dataset dataset) {
-    int trainingSetOrder[] = {0,1,2,3};
+    int numTrainingSets = dataset.training_inputs.size();
+
+    std::vector<int> trainingSetOrder = {};
+    // for i in, and then initlize incrementing up to length
 
     for (int epoch = 0; epoch < numEpochs; epoch++) {
 

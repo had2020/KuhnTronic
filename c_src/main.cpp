@@ -5,36 +5,23 @@
 #include <time.h>
 #include "time.h"
 #include <unistd.h>
-#include "nnet.c"
-#include "kuhnStates.c"
+#include <vector>
+#include "nnet.cpp"
+#include "kuhnStates.cpp"
 
 int main(int argc, char *argv[]) {
 
     struct Model model = {};
     init(model);
 
-    struct dataset dataset = {};
+    struct dataset dataset;
 
-    /*
-    struct dataset.training_inputs = {
-        {0.0f, 0.0f},
-        {1.0f, 0.0f},
-        {0.0f, 1.0f},
-        {1.0f, 1.0f}
-    };*/
-
-    // Training for XOR
-    double training_inputs[numTrainingSets][numInputs] = {
-        {0.0f, 0.0f},
-        {1.0f, 0.0f},
-        {0.0f, 1.0f},
-        {1.0f, 1.0f}
-    };
-    **dataset.training_inputs = **training_inputs;
-
-    for (int i = 0; i < numTrainingSets; i++ ) {
-        printf("idx: [%d] = %f", i, dataset.training_inputs[1][i]);
-    }
+    // TODO API 
+    dataset.training_inputs.reserve(32);
+    dataset.training_outputs.reserve(32);
+    dataset.training_inputs.push_back({1.0, 0.0, 1.0, 0.0});
+    dataset.training_outputs.push_back({2.0});
+    train(10000, 0.1, model, dataset);
 
 
     if (argc == 2) {
@@ -42,8 +29,13 @@ int main(int argc, char *argv[]) {
 
         while(1) {
             int input_s;
-            scanf("%d", &input_s);
-            printf("%d\n", node_tree[input_s]);
+            if (scanf("%d", &input_s)) {
+                printf("%d\n", node_tree[input_s]);
+            } else {
+                printf("Input failed to read!");
+                break;
+            }
+
         }
 
     } else {
