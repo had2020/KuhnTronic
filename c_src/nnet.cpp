@@ -1,4 +1,5 @@
 #include <array>
+#include <cstring>
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
@@ -62,8 +63,8 @@ void shuffle(std::vector<int> array, size_t n) {
     }
 }
 
-#define numInputs 4
-#define numHiddenNodes 8
+#define numInputs 6
+#define numHiddenNodes 16
 #define numOuputs 1
 //#define numTrainingSets 4
 
@@ -146,11 +147,14 @@ void train(uint64_t numEpochs, double learningRate, struct Model model, const st
                 model.outputLayer[j] = sigmoid(activation);
             }
 
+            // TODO only print end result, and show each whole buffer 
+            // or maybe like process checks after x amount of iters.
+            /*
             printf("Input: %g   Output: %g   Predicted Output: %g \n",
                 dataset.training_inputs[i][0],
                 model.outputLayer[0],
                 dataset.training_outputs[i][0]
-            );
+            );*/
 
             // Backprop
 
@@ -195,7 +199,12 @@ void train(uint64_t numEpochs, double learningRate, struct Model model, const st
     }
 }
 
-uintptr_t forwardPass(struct Model model, double inputs[numInputs]) {
+void forwardPass(const struct Model& model, const double inputs[numInputs], void *__restrict dest) {
+    double hiddenLayerClone[numHiddenNodes] = {};
+    memcpy(&hiddenLayerClone, &model.hiddenLayer, sizeof(model.hiddenLayer));
+    double outputLayerClone[numOuputs] = {};
+    memcpy(&outputLayerClone, &model.outputLayer, sizeof(model.outputLayer));
+
     // Compute hidden Layer Activation
     for (int j = 0; j < numHiddenNodes; j++){
         double activation = model.hiddenLayerBias[j];
@@ -203,7 +212,7 @@ uintptr_t forwardPass(struct Model model, double inputs[numInputs]) {
         for (int k = 0; k < numInputs; k++) {
             activation += inputs[k] * model.hiddenWeights[k][j];
         }
-        model.hiddenLayer[j] = sigmoid(activation);
+        hiddenLayerClone[j] = sigmoid(activation);
     }
 
     // Compute output layer activation
@@ -213,8 +222,8 @@ uintptr_t forwardPass(struct Model model, double inputs[numInputs]) {
         for (int k = 0; k < numHiddenNodes; k++) {
             activation += model.hiddenLayer[k] * model.outputWeights[k][j];
         }
-        model.outputLayer[j] = sigmoid(activation);
+        outputLayerClone[j] = sigmoid(activation);
     }
 
-    return model.outputLayer[0];
+    dest = outputLayerClone;
 }
