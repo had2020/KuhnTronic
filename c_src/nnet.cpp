@@ -105,10 +105,16 @@ void init(struct Model model) {
 }
 
 // learningRate works at 0.1
-void train(uint64_t numEpochs, double learningRate, struct Model model, struct dataset dataset) {
+void train(uint64_t numEpochs, double learningRate, struct Model model, const struct dataset& dataset) {
     int numTrainingSets = dataset.training_inputs.size();
 
     std::vector<int> trainingSetOrder = {};
+    trainingSetOrder.reserve(numTrainingSets);
+    
+    for (int i=numTrainingSets-1; i >= 0; i--) {
+        trainingSetOrder.push_back(i);
+        printf("i: %d", i);
+    }
     // for i in, and then initlize incrementing up to length
 
     for (int epoch = 0; epoch < numEpochs; epoch++) {

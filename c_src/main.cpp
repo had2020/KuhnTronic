@@ -19,10 +19,13 @@ int main(int argc, char *argv[]) {
     // TODO API 
     dataset.training_inputs.reserve(32);
     dataset.training_outputs.reserve(32);
-    dataset.training_inputs.push_back({1.0, 0.0, 1.0, 0.0});
-    dataset.training_outputs.push_back({2.0});
-    train(10000, 0.1, model, dataset);
 
+    dataset.training_inputs.push_back({67.0, 67.0, 0.0, 0.0});
+    dataset.training_outputs.push_back({0.0});
+    dataset.training_inputs.push_back({0.0, 0.0, 67.0, 67.0});
+    dataset.training_outputs.push_back({0.1});
+
+    train(10000, 0.1, model, dataset);
 
     if (argc == 2) {
         printf("Raw debugging mode enabled. Input first State as a number: \n");
