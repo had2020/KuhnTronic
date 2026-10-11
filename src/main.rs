@@ -1,3 +1,7 @@
+use crate::nnet::test;
+
+mod nnet;
+
 fn main() {
-    println!("Hello, world!");
+    println!("{}", test("t"));
 }
