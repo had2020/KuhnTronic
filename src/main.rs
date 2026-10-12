@@ -1,7 +1,7 @@
-use crate::nnet::test;
+use crate::nnet::*;
 
 mod nnet;
 
 fn main() {
-    println!("{}", test("t"));
+    println!("Rust ML Inferance Online:")
 }
