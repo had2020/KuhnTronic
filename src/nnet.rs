@@ -1,4 +1,5 @@
 use rand::{random, random_range};
+use serde::{Deserialize, Serialize};
 
 pub const NUM_INPUTS: usize = 6;
 pub const NUM_HIDDEN_NODES: usize = 16;
@@ -24,7 +25,7 @@ pub struct DataSet {
     pub outputs: Vec<[f64; NUM_OUTPUTS]>,
 }
 
-#[derive(Default)]
+#[derive(Serialize, Deserialize, Default)]
 pub struct Model {
     pub hidden_layer: [f64; NUM_HIDDEN_NODES],
     pub output_layer: [f64; NUM_OUTPUTS],
@@ -137,5 +138,10 @@ impl Model {
                 self.hidden_weights[j][i] += input[j] * delta_hidden[i] * LEARNING_RATE;
             }
         }
+    }
+
+    pub fn save_state_binary(self, filename: &str) {
+        let encoded = bincode::serialize(&(dish, settings)).unwrap();
+        std::fs::write(filename, encoded).unwrap();
     }
 }

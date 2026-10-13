@@ -111,7 +111,7 @@ void train(uint64_t numEpochs, double learningRate, struct Model model, const st
 
     std::vector<int> trainingSetOrder = {};
     trainingSetOrder.reserve(numTrainingSets);
-    
+
     for (int i=numTrainingSets-1; i >= 0; i--) {
         trainingSetOrder.push_back(i);
         printf("i: %d", i);
@@ -147,7 +147,7 @@ void train(uint64_t numEpochs, double learningRate, struct Model model, const st
                 model.outputLayer[j] = sigmoid(activation);
             }
 
-            // TODO only print end result, and show each whole buffer 
+            // TODO only print end result, and show each whole buffer
             // or maybe like process checks after x amount of iters.
             /*
             printf("Input: %g   Output: %g   Predicted Output: %g \n",
