@@ -140,8 +140,13 @@ impl Model {
         }
     }
 
-    pub fn save_state_binary(self, filename: &str) {
-        let encoded = bincode::serialize(&(dish, settings)).unwrap();
-        std::fs::write(filename, encoded).unwrap();
+    pub fn save_model_json(self, filename: &str) {
+        let json = serde_json::to_string(&self).unwrap();
+        std::fs::write(filename, json).unwrap();
+    }
+
+    pub fn load_model_json(filename: &str) -> Model {
+        let content = std::fs::read_to_string(filename).unwrap();
+        return serde_json::from_str(&content).unwrap();
     }
 }

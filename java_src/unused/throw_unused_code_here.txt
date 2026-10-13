@@ -1,2 +1,0 @@
-I dont recommend fully deleting large codebase changes.
-It's best to keep them stored, so that you can always review them later.
