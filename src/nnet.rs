@@ -141,12 +141,15 @@ impl Model {
     }
 
     pub fn save_model_json(self, filename: &str) {
-        let json = serde_json::to_string(&self).unwrap();
-        std::fs::write(filename, json).unwrap();
+        let json =
+            serde_json::to_string(&self).expect("\nFailed to parse model data to json format!\n");
+        std::fs::write(filename, json).expect("\nFailed to write model json file to disk!\n");
     }
 
-    pub fn load_model_json(filename: &str) -> Model {
-        let content = std::fs::read_to_string(filename).unwrap();
-        return serde_json::from_str(&content).unwrap();
+    pub fn load_model_json(mut self, filename: &str) {
+        let content =
+            std::fs::read_to_string(filename).expect("\nFailed to read model file to string!\n");
+        self = serde_json::from_str(&content)
+            .expect("\nFailed to assign model holder struct from parsed model data!\n");
     }
 }
