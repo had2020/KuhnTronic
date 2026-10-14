@@ -29,6 +29,10 @@ public class Main {
         System.out.println("Input the move Call, Fold, Check or Bet");
         String move = scnr.next();
 
+    // https://workforce.lightcastcc.com/browse-careers/12?region=San%20Diego&radius=
+
+    // https://yournextstep.workforce.org/your-next-step/industries/
+        
         if (move.contentEquals("Call")) { // PLEASE DO NOT USE REGULAR EQUALITY CHECKS ON STRINGS. MUST USE CONTENTEQUALS()
             System.out.println("You called");
         } else if (move.contentEquals("Fold")) {
