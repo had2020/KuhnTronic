@@ -8,10 +8,10 @@ public class initcards {
         // gen   3 King 2 Queen 1 Joker
         // AI:
         // User:
-        // Card middle: 
+        // Card middle:
     Random hands = new Random();
     Scanner in = new Scanner(System.in);
-   
+
     int hands_player1 = hands.nextInt(1,4);
 
     int hands_player2 = hands.nextInt(1,4);
@@ -24,7 +24,7 @@ public class initcards {
         card_middle = hands.nextInt(1,4);
      }
          //player 1 always starts first
-         //cost 1 chip per player per tern, 2 in pot. 
+         //cost 1 chip per player per tern, 2 in pot.
 
     int chips_table = 2;
     int chips_player1 = 1;
@@ -43,8 +43,8 @@ public class initcards {
     }
 
 
-    
-    
+
+
 
 
 
