@@ -3,6 +3,47 @@ import java.util.Scanner;
 // java Scanner learn input and output
 
 public class initcards {
+    // Note I had to move the states by 1 foward as 0 is now no_action.
+enum GameState { // -> next best move
+  KEmpty , // -> KCheck
+  KCheck , // -> KCheckBet
+  KBet , // -> KBetCall
+  KCheckBet , // -> KCheckBetCall
+  // End game states
+  KCheckCheck ,
+  KCheckBetFold ,
+  KCheckBetCall ,
+  KBetFold ,
+  KBetCall ,
+
+  QEmpty , // -> QCheck
+  QCheck , // -> QCheckCheck
+  QBet , // -> QBetFold
+  QCheckBet , // -> QCheckBetFold
+  // End game states
+  QCheckCheck ,
+  QCheckBetFold ,
+  QCheckBetCall ,
+  QBetFold ,
+  QBetCall ,
+
+  JEmpty , // -> JBet
+  JCheck , // -> JCheckBet
+  JBet , // -> JBetFold
+  JCheckBet , // -> JCheckBetFold
+  // End game states
+  JCheckCheck ,
+  JCheckBetFold ,
+  JCheckBetCall ,
+  JBetFold ,
+  JBetCall ,
+
+  NoAction ,
+};
+
+
+
+
     public static void main(String[] args) {
 
         // gen   3 King 2 Queen 1 Joker
@@ -11,6 +52,17 @@ public class initcards {
         // Card middle: 
     Random hands = new Random();
     Scanner in = new Scanner(System.in);
+
+    // this uint8_t stores the next best action index
+    // The best move is index + 1 as I shifted them by 1.
+    GameState[] node_tree = new GameState[] {
+            GameState.KCheck, GameState.KCheckBet, GameState.KBetCall, GameState.KCheckBetCall,
+            GameState.NoAction, GameState.NoAction, GameState.NoAction, GameState.NoAction, GameState.NoAction,
+            GameState.QCheck, GameState.QCheckCheck, GameState.QBetFold, GameState.QCheckBetFold,
+            GameState.NoAction, GameState.NoAction, GameState.NoAction, GameState.NoAction, GameState.NoAction,
+            GameState.JBet, GameState.JCheckBet, GameState.JBetFold, GameState.JCheckBetFold,
+            GameState.NoAction, GameState.NoAction, GameState.NoAction, GameState.NoAction, GameState.NoAction
+        };
    
     int hands_player1 = hands.nextInt(1,4);
 
@@ -24,7 +76,7 @@ public class initcards {
         card_middle = hands.nextInt(1,4);
      }
          //player 1 always starts first
-         //cost 1 chip per player per tern, 2 in pot. 
+         //cost 1 chip per player per tern, 1 more to bet, 2 in pot. 
 
     int chips_table = 2;
     int chips_player1 = 1;
@@ -35,10 +87,14 @@ public class initcards {
     int choice = in.nextInt();
 
     while (choice != 1 && choice != 2){
-        System.out.println("Type Check to check, and Bet to bet.");
+        System.out.println("Type 1 to check, and 2 to bet.");
         choice = in.nextInt();
     }
     if (choice == 2){
+    chips_player1 = chips_player1 - 1;
+    chips_table = chips_table + 1;
+        //player 2 is asked to check, fold or raise 
+    }
 
     }
 
@@ -60,4 +116,4 @@ public class initcards {
 
 
 
-}
+
