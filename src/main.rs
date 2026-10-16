@@ -1,6 +1,6 @@
 use crate::nnet::*;
 use input_method::input;
-use rusqlite::{Connection, Result};
+use rusqlite::{Connection, Params, Result};
 use std::env;
 
 mod nnet;
@@ -17,7 +17,23 @@ fn main() {
         } else if arg0.eq_ignore_ascii_case("Train") {
             println!("Training process started.");
 
-            let conn = Connection::open("training_data.db");
+            let db: Connection =
+                Connection::open("kuhn_training_data.db").expect("Could not open database object!");
+            /*
+            db.execute(
+                "CREATE TABLE IF NOT EXISTS dataset (
+                    id INTEGER PRIMARY KEY,
+                    input0 DOUBLE NOT NULL,
+                    input1 DOUBLE NOT NULL,
+                    input2 DOUBLE NOT NULL,
+                    input3 DOUBLE NOT NULL,
+                    input4 DOUBLE NOT NULL,
+                    input5 DOUBLE NOT NULL,
+                    output DOUBLE NOT NULL,
+                )",
+                (),
+            )
+            .expect("SQL failed to execute!"); */
             //TODO read docs: https://docs.rs/rusqlite/latest/rusqlite/struct.Connection.html#method.open
         } else {
             println!(
