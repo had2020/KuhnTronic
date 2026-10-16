@@ -49,7 +49,7 @@ enum GameState { // -> next best move
         // gen   3 King 2 Queen 1 Joker
         // AI:
         // User:
-        // Card middle: 
+        // Card middle:
     Random hands = new Random();
     Scanner in = new Scanner(System.in);
 
@@ -99,8 +99,8 @@ enum GameState { // -> next best move
     }
 
 
-    
-    
+
+
 
 
 
