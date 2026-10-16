@@ -5,9 +5,7 @@ public class databaseGen {
         // It's a good code base 👌🏻
         Connection c = null;
 
-
-
-        try (Connection con = DriverManager.getConnection("kuhn_training_data.db"); ) {
+        try (Connection con = DriverManager.getConnection("jdbc:sqlite:kuhn_training_data.db"); ) {
             Statement st = con.createStatement();
 
             String sql = """
@@ -22,6 +20,8 @@ public class databaseGen {
                 output DOUBLE NOT NULL,
             )
             """;
+
+
 
             st.execute(sql);
 
