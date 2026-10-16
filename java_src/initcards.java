@@ -53,17 +53,22 @@ enum GameState { // -> next best move
     Random hands = new Random();
     Scanner in = new Scanner(System.in);
 
-    // this uint8_t stores the next best action index
+    // this uint8_t stores the next best action index, for the AI.
     // The best move is index + 1 as I shifted them by 1.
     GameState[] node_tree = new GameState[] {
-            GameState.KCheck, GameState.KCheckBet, GameState.KBetCall, GameState.KCheckBetCall,
-            GameState.NoAction, GameState.NoAction, GameState.NoAction, GameState.NoAction, GameState.NoAction,
-            GameState.QCheck, GameState.QCheckCheck, GameState.QBetFold, GameState.QCheckBetFold,
-            GameState.NoAction, GameState.NoAction, GameState.NoAction, GameState.NoAction, GameState.NoAction,
-            GameState.JBet, GameState.JCheckBet, GameState.JBetFold, GameState.JCheckBetFold,
-            GameState.NoAction, GameState.NoAction, GameState.NoAction, GameState.NoAction, GameState.NoAction
-        };
-   
+        GameState.KCheck, GameState.KCheckBet, GameState.KBetCall, GameState.KCheckBetCall,
+        GameState.NoAction, GameState.NoAction, GameState.NoAction, GameState.NoAction, GameState.NoAction,
+        GameState.QCheck, GameState.QCheckCheck, GameState.QBetFold, GameState.QCheckBetFold,
+        GameState.NoAction, GameState.NoAction, GameState.NoAction, GameState.NoAction, GameState.NoAction,
+        GameState.JBet, GameState.JCheckBet, GameState.JBetFold, GameState.JCheckBetFold,
+        GameState.NoAction, GameState.NoAction, GameState.NoAction, GameState.NoAction, GameState.NoAction
+    };
+
+    // Example within the while with the players:
+    // P1 (AI) goes first, and they have King, but P2 Joker.
+    GameState gameState = node_tree[GameState.KEmpty.ordinal()];
+
+
     int hands_player1 = hands.nextInt(1,4);
 
     int hands_player2 = hands.nextInt(1,4);
@@ -76,7 +81,7 @@ enum GameState { // -> next best move
         card_middle = hands.nextInt(1,4);
      }
          //player 1 always starts first
-         //cost 1 chip per player per tern, 1 more to bet, 2 in pot. 
+         //cost 1 chip per player per tern, 1 more to bet, 2 in pot.
 
     int chips_table = 2;
     int chips_player1 = 1;
@@ -93,7 +98,7 @@ enum GameState { // -> next best move
     if (choice == 2){
     chips_player1 = chips_player1 - 1;
     chips_table = chips_table + 1;
-        //player 2 is asked to check, fold or raise 
+        //player 2 is asked to check, fold or raise
     }
 
     }
@@ -110,10 +115,3 @@ enum GameState { // -> next best move
 
 
 }
-
-
-
-
-
-
-
