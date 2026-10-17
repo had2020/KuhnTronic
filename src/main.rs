@@ -35,11 +35,31 @@ fn main() {
             )
             .expect("SQL failed to execute!"); */
             //TODO read docs: https://docs.rs/rusqlite/latest/rusqlite/struct.Connection.html#method.open
+        } else if (arg0.eq_ignore_ascii_case("Generate")) {
+            println!("Using Simulator to generate data points.");
+            let db: Connection =
+                Connection::open("kuhn_training_data.db").expect("Could not open database object!");
+
+            db.execute(
+                "CREATE TABLE IF NOT EXISTS dataset (
+                    id INTEGER PRIMARY KEY,
+                    input0 DOUBLE NOT NULL,
+                    input1 DOUBLE NOT NULL,
+                    input2 DOUBLE NOT NULL,
+                    input3 DOUBLE NOT NULL,
+                    input4 DOUBLE NOT NULL,
+                    input5 DOUBLE NOT NULL,
+                    output DOUBLE NOT NULL,
+                )",
+                (),
+            )
+            .expect("SQL failed to execute!");
         } else {
             println!(
-                "IMPROPPER CLI ARGUMENT! \n{}{}",
+                "IMPROPPER CLI ARGUMENT! \n{}{}{}",
                 "\nYou can also re-run with these commands:",
-                "\n\t'Debug' for detached debugger, or 'Train' for detached trainner"
+                "\n\t'Debug' for detached debugger, or 'Train' for detached trainner",
+                "\n\t'Generate' for a detached simulator to generate data."
             );
         }
     } else {
@@ -48,16 +68,18 @@ fn main() {
             model.load_model_json("model/model.json");
 
             println!(
-                "The Rust interface is running, press control+c to kill it.\n{}{}",
+                "The Rust interface is running, press control+c to kill it.\n{}{}{}",
                 "\nYou can also re-run with these commands:",
-                "\n\t'Debug' for detached debugger, or 'Train' for detached trainner"
+                "\n\t'Debug' for detached debugger, or 'Train' for detached trainner",
+                "\n\t'Generate' for a detached simulator to generate data."
             );
 
             //TODO possible run a Rust Rocket HTTP server with POST and GET
         } else {
             println!(
-                "No model file found!\nCheck if you have model file on you filesystem, as {}",
-                "'model/model.json'\n\tOr re-run with command 'Train' for a detached trainner."
+                "No model file found!\nCheck if you have model file on you filesystem, as {}{}",
+                "'model/model.json'\n\tOr re-run with command 'Train' for a detached trainner.",
+                "\n\t'Generate' for a detached simulator to generate data."
             );
         }
     }
