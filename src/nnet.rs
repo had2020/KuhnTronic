@@ -1,6 +1,12 @@
 use rand::{random, random_range};
 use serde::{Deserialize, Serialize};
 
+/* Model layout:
+First 3 inputs classify the AI's card:
+    [1.0, 0.0, 0.0] -> King, [0.0, 1.0, 0.0] -> Queen, [0.0, 0.0, 1.0] -> joker.
+Last 3 inputs classify the last action sequence in the game:
+    Action types: {Bet: 1.0, Pass: -1.0, NULL: 0.0}
+*/
 pub const NUM_INPUTS: usize = 6;
 pub const NUM_HIDDEN_NODES: usize = 16;
 pub const NUM_OUTPUTS: usize = 1;

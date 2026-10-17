@@ -5,6 +5,44 @@ use std::env;
 
 mod nnet;
 
+enum GameState {
+    // -> next best move
+    KEmpty,    // -> KCheck
+    KCheck,    // -> KCheckBet
+    KBet,      // -> KBetCall
+    KCheckBet, // -> KCheckBetCall
+    // End game states
+    KCheckCheck,
+    KCheckBetFold,
+    KCheckBetCall,
+    KBetFold,
+    KBetCall,
+
+    QEmpty,    // -> QCheck
+    QCheck,    // -> QCheckCheck
+    QBet,      // -> QBetFold
+    QCheckBet, // -> QCheckBetFold
+    // End game states
+    QCheckCheck,
+    QCheckBetFold,
+    QCheckBetCall,
+    QBetFold,
+    QBetCall,
+
+    JEmpty,    // -> JBet
+    JCheck,    // -> JCheckBet
+    JBet,      // -> JBetFold
+    JCheckBet, // -> JCheckBetFold
+    // End game states
+    JCheckCheck,
+    JCheckBetFold,
+    JCheckBetCall,
+    JBetFold,
+    JBetCall,
+
+    NoAction,
+}
+
 fn main() {
     let mut model: Model = Model::new();
 
@@ -39,7 +77,12 @@ fn main() {
             println!("Using Simulator to generate data points.");
             let db: Connection =
                 Connection::open("kuhn_training_data.db").expect("Could not open database object!");
-
+            /* Model layout:
+            First 3 inputs classify the AI's card:
+                [1.0, 0.0, 0.0] -> King, [0.0, 1.0, 0.0] -> Queen, [0.0, 0.0, 1.0] -> joker.
+            Last 3 inputs classify the last action sequence in the game:
+                Action types: {Bet: 1.0, Pass: -1.0, NULL: 0.0}
+            */
             db.execute(
                 "CREATE TABLE IF NOT EXISTS dataset (
                     id INTEGER PRIMARY KEY,
@@ -49,11 +92,16 @@ fn main() {
                     input3 DOUBLE NOT NULL,
                     input4 DOUBLE NOT NULL,
                     input5 DOUBLE NOT NULL,
-                    output DOUBLE NOT NULL,
+                    output DOUBLE NOT NULL
                 )",
                 (),
             )
-            .expect("SQL failed to execute!");
+            .expect("SQL failed to execute, createing table if not exists!");
+
+            // the max number of finite states
+            const OWN_CARD_FS: u8 = 3;
+
+            for i in OWN_CARD_FS..0 {}
         } else {
             println!(
                 "IMPROPPER CLI ARGUMENT! \n{}{}{}",
