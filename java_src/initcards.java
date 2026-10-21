@@ -134,7 +134,58 @@ if (choice == 2){
     }
 } else {
     System.out.println("Player 1 (CPU) checks.");
+
+    System.out.println("Type 1 to check, and 2 to bet.");
+    int choice2 = in.nextInt();
+    while (choice2 != 1 && choice2 != 2){
+        System.out.println("Type 1 to check, and 2 to bet.");
+        choice2 = in.nextInt();
+    }
+    if (choice2 == 1){
+        System.out.println("You check.");
+        if (hands_p1 == 3){
+            end = GameState.KCheckCheck;
+        } else if (hands_p1 == 2){
+            end = GameState.QCheckCheck;
+        } else {
+            end = GameState.JCheckCheck;
+        }
+    } else {
+        System.out.println("You bet.");
+        chips_p2 = chips_p2 + 1;
+        chips_table = chips_table + 1;
+
+        if (hands_p1 == 3){
+            System.out.println("Player 1 (CPU) calls.");
+            chips_p1 = chips_p1 + 1;
+            chips_table = chips_table + 1;
+            end = GameState.KCheckBetCall;
+        } else {
+            System.out.println("Player 1 (CPU) folds.");
+            winner = 2;
+            if (hands_p1 == 2){
+                end = GameState.QCheckBetFold;
+            } else {
+                end = GameState.JCheckBetFold;
+            }
+        }
+    }
 }
+if (winner == 0){
+    System.out.println("Player 1 (CPU) has: " + hands_p1);
+    if (hands_p1 > hands_p2){
+        winner = 1;
+    } else {
+        winner = 2;
+    }
+}
+if (winner == 2){
+    System.out.println("You win " + chips_p1 + "chips.");
+} else {
+    System.out.println("Player 1 (CPU) wins " + chips_p2 + "chips.");
+}
+
+
 System.out.println("Pot: " + chips_table);
 System.out.println(end);
 
@@ -142,6 +193,7 @@ System.out.println(end);
     
     }
 }
+
 
 
 
