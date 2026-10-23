@@ -211,17 +211,19 @@ fn main() {
             }
 
             model.train(dataset, 10000000);
+            model.save_model_json("model/kuhn.json");
             let mut output: f64 = 0.0;
             {
                 let mut model_clone: Model = model.clone();
-                //model_clone.forward_pass([1.0, 0.0, 0.0, -1.0, 0.0]); // should be pos
-                //model_clone.forward_pass([0.0, 0.0, 1.0, -1.0, 1.0]); // should be neg
+                model_clone.forward_pass([1.0, 0.0, 0.0, -1.0, 0.0]); // should be far from -1
+                //model_clone.forward_pass([0.0, 0.0, 1.0, -1.0, 1.0]); // should be near to -1
                 output = model_clone.output_layer[0];
             }
             println!("{output}");
             //
         } else if (arg0.eq_ignore_ascii_case("Generate")) {
             println!("Using Simulator to generate data points.");
+            println!("This is done in Train now, until a more advanced poker.")
             /*
             let db: Connection =
                 Connection::open("kuhn_training_data.db").expect("Could not open database object!");
