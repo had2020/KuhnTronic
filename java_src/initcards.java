@@ -65,64 +65,159 @@ enum GameState { // -> next best move
     };
 
     // Example within the while with the players:
-    // P1 (AI) goes first, and they have King, but P2 Joker.
+    // P1 (CPU) goes first, and they have King, but P2 Joker.
     GameState gameState = node_tree[GameState.KEmpty.ordinal()];
-    
-        // Ante
-    int chips_table = 2;
-    int chips_player1 = 1;
-    int chips_player2 = 1;
 
+int chips_p1 = 10;   
+int chips_p2 = 10;   
+int chips_pot = 0;   
+boolean playing = true;
 
-    int hands_player1 = hands.nextInt(1,4);
+while (playing){
+    int hands_p1 = hands.nextInt(1,4);
 
-    int hands_player2 = hands.nextInt(1,4);
-    while (hands_player2 == hands_player1){
-        hands_player2 = hands.nextInt(1,4);
+    int hands_p2 = hands.nextInt(1,4);
+    while (hands_p2 == hands_p1){
+        hands_p2 = hands.nextInt(1,4);
     }
 
     int card_middle = hands.nextInt(1,4);
-     while (card_middle == hands_player1 || card_middle == hands_player2){
+     while (card_middle == hands_p1 || card_middle == hands_p2){
         card_middle = hands.nextInt(1,4);
      }
-         //player 1 always starts first
+         //player 1 (the cpu) always starts first
          //cost 1 chip per player per tern, 1 more to bet, 2 in pot.
 
+    chips_pot = 2;             
+    chips_p1 = chips_p1 - 1;   
+    chips_p2 = chips_p2 - 1;   
+    GameState end = GameState.NoAction;
+    int winner = 0;
 
-        //while loop below: if player1(ai) checked, the player can bet. When the AI bet, player one needs to check or fold
+System.out.println("\u001B[32m" + "Your card is: " + hands_p2 + "\u001B[0m");
+System.out.println("Chips - You: " + chips_p2 + ", CPU: " + chips_p1 + ", Pot: " + chips_pot);
 
-    System.out.println("Your card is: " + hands_player2);
-    System.out.println("\u001B[0m" +"Would you like to " + "\u001B[32m" + "Check (1)"+ "\u001B[0m" + " or " + "\u001B[31m" + "Bet(2)" + "\u001B[0m" + "?:");
-    int choice = in.nextInt();
-
-     //if player 1 and 2 checked, showdown. if player 1 bet, +1 pot, 
-     
-
-     while (hands_player2 = 3);
-
-
-    while (choice != 1 && choice != 2){
-        System.out.println("Type 1 to check, and 2 to bet.");
-        choice = in.nextInt();
-    }
-    if (choice == 2){
-    chips_player2 = chips_player2 - 1;
-    chips_table = chips_table + 1;
-        //player 2 is asked to check, fold or raise
-    }
-
-
-    }
-
-
-
-
-
-
-
-
-
-
-
-
+int choice = 1;
+if (hands_p1 == 1){
+    choice = 2;
 }
+
+if (choice == 2){
+    System.out.println("Player 1 (CPU) bets.");
+    chips_p1 = chips_p1 - 1;
+    chips_pot = chips_pot + 1;
+    System.out.println("Chips - You: " + chips_p2 + ", CPU: " + chips_p1 + ", Pot: " + chips_pot);
+
+    System.out.println("Type 1 to call, and 2 to fold.");
+    int choice2 = in.nextInt();
+    while (choice2 != 1 && choice2 != 2){
+        System.out.println("Type 1 to call, and 2 to fold.");
+        choice2 = in.nextInt();
+    }
+    if (choice2 == 1){
+        System.out.println("You call.");
+        chips_p2 = chips_p2 - 1;
+        chips_pot = chips_pot + 1;
+        System.out.println("Chips - You: " + chips_p2 + ", CPU: " + chips_p1 + ", Pot: " + chips_pot);
+
+        if (hands_p1 == 3){
+            end = GameState.KBetCall;
+        } else if (hands_p1 == 2){
+            end = GameState.QBetCall;
+        } else {
+            end = GameState.JBetCall;
+        }
+    } else {
+        System.out.println("You fold.");
+        winner = 1;
+
+        if (hands_p1 == 3){
+            end = GameState.KBetFold;
+        } else if (hands_p1 == 2){
+            end = GameState.QBetFold;
+        } else {
+            end = GameState.JBetFold;
+        }
+    }
+} else {
+    System.out.println("Player 1 (CPU) checks.");
+
+    System.out.println("Type 1 to check, and 2 to bet.");
+    int choice2 = in.nextInt();
+    while (choice2 != 1 && choice2 != 2){
+        System.out.println("Type 1 to check, and 2 to bet.");
+        choice2 = in.nextInt();
+    }
+    if (choice2 == 1){
+        System.out.println("You check.");
+        if (hands_p1 == 3){
+            end = GameState.KCheckCheck;
+        } else if (hands_p1 == 2){
+            end = GameState.QCheckCheck;
+        } else {
+            end = GameState.JCheckCheck;
+        }
+    } else {
+        System.out.println("You bet.");
+        chips_p2 = chips_p2 - 1;
+        chips_pot = chips_pot + 1;
+        System.out.println("Chips - You: " + chips_p2 + ", CPU: " + chips_p1 + ", Pot: " + chips_pot);
+
+        if (hands_p1 == 3){
+            System.out.println("Player 1 (CPU) calls.");
+            chips_p1 = chips_p1 - 1;
+            chips_pot = chips_pot + 1;
+            System.out.println("Chips - You: " + chips_p2 + ", CPU: " + chips_p1 + ", Pot: " + chips_pot);
+            end = GameState.KCheckBetCall;
+        } else {
+            System.out.println("Player 1 (CPU) folds.");
+            winner = 2;
+            if (hands_p1 == 2){
+                end = GameState.QCheckBetFold;
+            } else {
+                end = GameState.JCheckBetFold;
+            }
+        }
+    }
+}
+if (winner == 0){
+    System.out.println("Player 1 (CPU) has: " + hands_p1);
+    if (hands_p1 > hands_p2){
+        winner = 1;
+    } else {
+        winner = 2;
+    }
+}
+if (winner == 2){
+    chips_p2 = chips_p2 + chips_pot;
+    System.out.println("\u001B[34m" + "You win the pot of " + chips_pot + " chips." + "\u001B[0m");
+} else {
+    chips_p1 = chips_p1 + chips_pot;
+    System.out.println("\u001B[31m" + "Player 1 (CPU) wins the pot of " + chips_pot + " chips." + "\u001B[0m");
+}
+System.out.println("Chips - You: " + chips_p2 + ", CPU: " + chips_p1);
+
+System.out.println("Pot: " + chips_pot);
+System.out.println(end);
+
+if (chips_p1 < 2 || chips_p2 < 2){
+    System.out.println("Game over");
+    playing = false;
+}
+
+
+
+
+    
+    }
+}
+}
+
+
+
+
+
+
+
+
+
