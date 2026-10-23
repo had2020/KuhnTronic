@@ -256,11 +256,31 @@ fn main() {
                 "\n\t'Debug' for detached debugger, or 'Train' for detached trainner",
                 "\n\t'Generate' for a detached simulator to generate data."
             );
+
+            if std::fs::exists("model/kuhn.json").expect("Error with filesystem syscall!") {
+                model.load_model_json("model/kuhn.json");
+                println!("You have a Joker Card.\n Enter your first move as Bet or Check: ");
+                let input: String = input();
+                if input.eq_ignore_ascii_case("Bet") {
+                    model.forward_pass([1.0, 0.0, 0.0, 1.0, 0.0]);
+                    if model.output_layer[0] > 0.0 {
+                        println!("Model played Bet!")
+                    } else {
+                        println!("Model played Check!")
+                    }
+                } else if input.eq_ignore_ascii_case("Check") {
+                    model.forward_pass([1.0, 0.0, 0.0, -1.0, 0.0]);
+                    if model.output_layer[0] > 0.0 {
+                        println!("Model played Bet!")
+                    } else {
+                        println!("Model played Check!")
+                    }
+                }
         }
     } else {
-        if std::fs::exists("model/model.json").unwrap() {
+        if std::fs::exists("model/kuhn.json").expect("Error with filesystem syscall!") {
             println!("Loading model file!");
-            model.load_model_json("model/model.json");
+            model.load_model_json("model/kuhn.json");
 
             println!(
                 "The Rust interface is running, press control+c to kill it.\n{}{}{}",
