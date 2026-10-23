@@ -8,30 +8,25 @@ Last 2 inputs classify the last action sequence in the game:
     Action types: {Bet: 1.0, Pass: -1.0, NULL: 0.0}
 */
 pub const NUM_INPUTS: usize = 5;
-pub const NUM_HIDDEN_NODES: usize = 16;
+pub const NUM_HIDDEN_NODES: usize = 5;
 pub const NUM_OUTPUTS: usize = 1;
 
 pub const LEARNING_RATE: f64 = 0.1;
 
 pub fn sigmoid(x: f64) -> f64 {
-    return 1.0 / (1.0 + -x.exp());
+    return 1.0 / (1.0 + (-x).exp()); // was -x.exp()
 }
 
 pub fn d_sigmoid(x: f64) -> f64 {
     return x * (1.0 - x); // Derivative
 }
 
-/*// TODO SIMD registers for more compution.
-pub fn sigmoid_int(x: i64) -> i64 {
-    return x; // TODO
-}*/
-
 pub struct DataSet {
     pub inputs: Vec<[f64; NUM_INPUTS]>,
     pub outputs: Vec<[f64; NUM_OUTPUTS]>,
 }
 
-#[derive(Serialize, Deserialize, Default)]
+#[derive(Serialize, Deserialize, Default, Clone, Copy)]
 pub struct Model {
     pub hidden_layer: [f64; NUM_HIDDEN_NODES],
     pub output_layer: [f64; NUM_OUTPUTS],
@@ -56,33 +51,37 @@ impl Model {
 
         // TODO: optimize
         for i in 0..r.hidden_layer.len() {
-            r.hidden_layer[i] = random();
+            r.hidden_layer[i] = random_range(-0.5..0.5);
         }
         for i in 0..r.output_layer.len() {
-            r.output_layer[i] = random();
+            r.output_layer[i] = random_range(-0.5..0.5);
         }
         for i in 0..r.hidden_layer_bias.len() {
-            r.hidden_layer_bias[i] = random();
+            r.hidden_layer_bias[i] = random_range(-0.5..0.5);
         }
         for i in 0..r.output_layer_bias.len() {
-            r.output_layer_bias[i] = random();
+            r.output_layer_bias[i] = random_range(-0.5..0.5);
         }
         for i in 0..r.hidden_weights.len() {
-            r.hidden_weights[i] = random();
+            for j in 0..NUM_HIDDEN_NODES {
+                r.hidden_weights[i][j] = random_range(-0.5..0.5);
+            }
         }
         for i in 0..r.output_weights.len() {
-            r.output_weights[i] = random();
+            for j in 0..NUM_OUTPUTS {
+                r.output_weights[i][j] = random_range(-0.5..0.5);
+            }
         }
 
         return r;
     }
 
-    pub fn train(mut self, dataset: DataSet, epochs: usize) {
-        // TODO? possibley random cases from dataset?
+    pub fn train(&mut self, dataset: DataSet, epochs: usize) {
         for _ in 0..epochs {
             let rng_set: usize = random_range(0..dataset.inputs.len());
-            std::mem::take(&mut self).forward_pass(dataset.inputs[rng_set]);
-            std::mem::take(&mut self).back_prop(dataset.outputs[rng_set], dataset.inputs[rng_set]);
+            //std::mem::
+            self.forward_pass(dataset.inputs[rng_set]);
+            self.back_prop(dataset.outputs[rng_set], dataset.inputs[rng_set]);
         }
     }
 
@@ -90,7 +89,7 @@ impl Model {
     /// Merely computes the activation functions for each layer, passing
     /// down the weights. Output is not returned, as it can be
     /// taken from the model.
-    pub fn forward_pass(mut self, input: [f64; NUM_INPUTS]) {
+    pub fn forward_pass(&mut self, input: [f64; NUM_INPUTS]) {
         for i in 0..NUM_HIDDEN_NODES {
             let mut activation = self.hidden_layer_bias[i];
 
@@ -111,7 +110,7 @@ impl Model {
     }
 
     /// Merely computes chage in output weights, applys the change.
-    pub fn back_prop(mut self, target_output: [f64; NUM_OUTPUTS], input: [f64; NUM_INPUTS]) {
+    pub fn back_prop(&mut self, target_output: [f64; NUM_OUTPUTS], input: [f64; NUM_INPUTS]) {
         // Computes changes in weights
         let mut delta_output = [0.0f64; NUM_OUTPUTS];
         for i in 0..NUM_OUTPUTS {

@@ -43,6 +43,37 @@ pub enum GameState {
     NoAction = 27,
 }
 
+/*
+let next_action_tree = [
+    GameState::KCheck,
+    GameState::KCheckBet,
+    GameState::KBetCall,
+    GameState::KCheckBetCall,
+    GameState::NoAction,
+    GameState::NoAction,
+    GameState::NoAction,
+    GameState::NoAction,
+    GameState::NoAction,
+    GameState::QCheck,
+    GameState::QCheckCheck,
+    GameState::QBetFold,
+    GameState::QCheckBetFold,
+    GameState::NoAction,
+    GameState::NoAction,
+    GameState::NoAction,
+    GameState::NoAction,
+    GameState::NoAction,
+    GameState::JBet,
+    GameState::JCheckBet,
+    GameState::JBetFold,
+    GameState::JCheckBetFold,
+    GameState::NoAction,
+    GameState::NoAction,
+    GameState::NoAction,
+    GameState::NoAction,
+    GameState::NoAction,
+];*/
+
 fn main() {
     let mut model: Model = Model::new();
 
@@ -85,36 +116,6 @@ fn main() {
             */
 
             const N_STATES: usize = 27;
-
-            let next_action_tree = [
-                GameState::KCheck,
-                GameState::KCheckBet,
-                GameState::KBetCall,
-                GameState::KCheckBetCall,
-                GameState::NoAction,
-                GameState::NoAction,
-                GameState::NoAction,
-                GameState::NoAction,
-                GameState::NoAction,
-                GameState::QCheck,
-                GameState::QCheckCheck,
-                GameState::QBetFold,
-                GameState::QCheckBetFold,
-                GameState::NoAction,
-                GameState::NoAction,
-                GameState::NoAction,
-                GameState::NoAction,
-                GameState::NoAction,
-                GameState::JBet,
-                GameState::JCheckBet,
-                GameState::JBetFold,
-                GameState::JCheckBetFold,
-                GameState::NoAction,
-                GameState::NoAction,
-                GameState::NoAction,
-                GameState::NoAction,
-                GameState::NoAction,
-            ];
 
             let mut dataset = DataSet {
                 inputs: vec![[0.0; 5]; N_STATES],
@@ -209,8 +210,15 @@ fn main() {
                 }
             }
 
-            model.train(dataset, 10000);
-
+            model.train(dataset, 100000);
+            let mut output: f64 = 0.0;
+            {
+                let mut model_clone: Model = model.clone();
+                model_clone.forward_pass([1.0, 0.0, 0.0, -1.0, 1.0]); // should be pos
+                //model_clone.forward_pass([0.0, 0.0, 1.0, -1.0, 1.0]); // should be neg
+                output = model_clone.output_layer[0];
+            }
+            println!("{output}");
             //
         } else if (arg0.eq_ignore_ascii_case("Generate")) {
             println!("Using Simulator to generate data points.");
