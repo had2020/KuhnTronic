@@ -68,9 +68,9 @@ enum GameState { // -> next best move
     // P1 (CPU) goes first, and they have King, but P2 Joker.
     GameState gameState = node_tree[GameState.KEmpty.ordinal()];
 
-int chips_p1 = 10;   // CPU chips (carried over from hand to hand)
-int chips_p2 = 10;   // your chips (carried over from hand to hand)
-int chips_pot = 0;   // chips in the middle (reset at the start of each hand)
+int chips_p1 = 10;   
+int chips_p2 = 10;   
+int chips_pot = 0;   
 boolean playing = true;
 
 while (playing){
@@ -85,7 +85,7 @@ while (playing){
      while (card_middle == hands_p1 || card_middle == hands_p2){
         card_middle = hands.nextInt(1,4);
      }
-         //player 1 always starts first
+         //player 1 (the cpu) always starts first
          //cost 1 chip per player per tern, 1 more to bet, 2 in pot.
 
     chips_pot = 2;             
@@ -201,7 +201,7 @@ System.out.println("Pot: " + chips_pot);
 System.out.println(end);
 
 if (chips_p1 < 2 || chips_p2 < 2){
-    System.out.println("Someone is out of chips. Game over!");
+    System.out.println("Game over");
     playing = false;
 }
 
