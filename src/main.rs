@@ -210,11 +210,11 @@ fn main() {
                 }
             }
 
-            model.train(dataset, 100000);
+            model.train(dataset, 10000000);
             let mut output: f64 = 0.0;
             {
                 let mut model_clone: Model = model.clone();
-                model_clone.forward_pass([1.0, 0.0, 0.0, -1.0, 1.0]); // should be pos
+                //model_clone.forward_pass([1.0, 0.0, 0.0, -1.0, 0.0]); // should be pos
                 //model_clone.forward_pass([0.0, 0.0, 1.0, -1.0, 1.0]); // should be neg
                 output = model_clone.output_layer[0];
             }

@@ -13,12 +13,12 @@ pub const NUM_OUTPUTS: usize = 1;
 
 pub const LEARNING_RATE: f64 = 0.1;
 
-pub fn sigmoid(x: f64) -> f64 {
-    return 1.0 / (1.0 + (-x).exp()); // was -x.exp()
+pub fn leaky_relu(x: f64) -> f64 {
+    if x > 0.0 { x } else { 0.01 * x }
 }
 
-pub fn d_sigmoid(x: f64) -> f64 {
-    return x * (1.0 - x); // Derivative
+pub fn d_leaky_relu(output: f64) -> f64 {
+    if output > 0.0 { 1.0 } else { 0.01 }
 }
 
 pub struct DataSet {
@@ -97,7 +97,7 @@ impl Model {
                 activation += input[j] * self.hidden_weights[i][j]; // TODO: SIMD
             }
 
-            self.hidden_layer[i] = sigmoid(activation);
+            self.hidden_layer[i] = leaky_relu(activation);
         }
 
         for i in 0..NUM_OUTPUTS {
@@ -105,7 +105,7 @@ impl Model {
             for j in 0..NUM_HIDDEN_NODES {
                 activation += self.hidden_layer[j] * self.output_weights[i][j];
             }
-            self.output_layer[i] = sigmoid(activation);
+            self.output_layer[i] = leaky_relu(activation);
         }
     }
 
@@ -116,7 +116,7 @@ impl Model {
         for i in 0..NUM_OUTPUTS {
             let output: f64 = self.output_layer[i];
             let error: f64 = target_output[i] - output;
-            delta_output[i] = error * d_sigmoid(output);
+            delta_output[i] = error * d_leaky_relu(output);
         }
 
         let mut delta_hidden = [0.0f64; NUM_HIDDEN_NODES];
@@ -125,7 +125,7 @@ impl Model {
             for j in 0..NUM_OUTPUTS {
                 error += delta_output[j] * self.output_weights[j][i];
             }
-            delta_hidden[i] = error * d_sigmoid(self.hidden_layer[i]);
+            delta_hidden[i] = error * d_leaky_relu(self.hidden_layer[i]);
         }
 
         // Applys changes in weights
