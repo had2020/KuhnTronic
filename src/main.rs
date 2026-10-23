@@ -276,6 +276,7 @@ fn main() {
                         println!("Model played Check!")
                     }
                 }
+            }
         }
     } else {
         if std::fs::exists("model/kuhn.json").expect("Error with filesystem syscall!") {
