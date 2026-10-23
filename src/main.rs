@@ -78,29 +78,13 @@ fn main() {
             /* Model layout:
             First 3 inputs classify the AI's card:
                 [1.0, 0.0, 0.0] -> King, [0.0, 1.0, 0.0] -> Queen, [0.0, 0.0, 1.0] -> joker.
-            Last 3 inputs classify the last action sequence in the game:
+            Last 2 inputs classify the last action sequence in the game:
                 Action types: {Bet: 1.0, Pass: -1.0, NULL: 0.0}
                 bets: Call, Bet
                 passes: Fold, Check
             */
 
             const N_STATES: usize = 27;
-
-            let mut dataset = DataSet {
-                inputs: vec![[0.0; 6]; N_STATES],
-                outputs: vec![[0.0]; N_STATES],
-            };
-
-            // starter card for AI
-            let mut last_idx = 0;
-            for i in 0..N_STATES {
-                dataset.inputs[i][last_idx] = 1.0;
-                if last_idx != 3 {
-                    last_idx += 1;
-                } else {
-                    last_idx = 0;
-                }
-            }
 
             let next_action_tree = [
                 GameState::KCheck,
@@ -132,7 +116,100 @@ fn main() {
                 GameState::NoAction,
             ];
 
-            println!("{:?}", dataset.inputs);
+            let mut dataset = DataSet {
+                inputs: vec![[0.0; 5]; N_STATES],
+                outputs: vec![[0.0]; N_STATES],
+            };
+
+            // starter card for AI
+            let mut last_idx = 0;
+            for i in 0..N_STATES {
+                dataset.inputs[i][last_idx] = 1.0;
+                if last_idx != 3 {
+                    last_idx += 1;
+                } else {
+                    last_idx = 0;
+                }
+
+                //?Empty
+                if (i == 0) || (i == 9) || (i == 18) {
+                    dataset.inputs[i][3] = -1.0;
+                    match last_idx {
+                        // k
+                        0 => {
+                            dataset.outputs[i][0] = 1.0;
+                        }
+                        // q
+                        1 => {
+                            dataset.outputs[i][0] = 1.0;
+                        }
+                        // j
+                        _ => {
+                            dataset.outputs[i][0] = 1.0;
+                        }
+                    }
+                }
+
+                //?Check
+                if (i == 1) || (i == 10) || (i == 19) {
+                    dataset.inputs[i][3] = -1.0;
+                    match last_idx {
+                        // k
+                        0 => {
+                            dataset.outputs[i][0] = 1.0;
+                        }
+                        // q
+                        1 => {
+                            dataset.outputs[i][0] = -1.0;
+                        }
+                        // j
+                        _ => {
+                            dataset.outputs[i][0] = 1.0;
+                        }
+                    }
+                }
+
+                //?Bet
+                if (i == 2) || (i == 11) || (i == 20) {
+                    dataset.inputs[i][3] = 1.0;
+                    match last_idx {
+                        // k
+                        0 => {
+                            dataset.outputs[i][0] = 1.0;
+                        }
+                        // q
+                        1 => {
+                            dataset.outputs[i][0] = -1.0;
+                        }
+                        // j
+                        _ => {
+                            dataset.outputs[i][0] = -1.0;
+                        }
+                    }
+                }
+
+                //?CheckBet
+                if (i == 3) == (i == 12) || (i == 21) {
+                    dataset.inputs[i][3] = -1.0;
+                    dataset.inputs[i][4] = 1.0;
+                    match last_idx {
+                        // k
+                        0 => {
+                            dataset.outputs[i][0] = 1.0;
+                        }
+                        // q
+                        1 => {
+                            dataset.outputs[i][0] = -1.0;
+                        }
+                        // j
+                        _ => {
+                            dataset.outputs[i][0] = -1.0;
+                        }
+                    }
+                }
+            }
+
+            model.train(dataset, 10000);
 
             //
         } else if (arg0.eq_ignore_ascii_case("Generate")) {

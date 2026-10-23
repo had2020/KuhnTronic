@@ -4,10 +4,10 @@ use serde::{Deserialize, Serialize};
 /* Model layout:
 First 3 inputs classify the AI's card:
     [1.0, 0.0, 0.0] -> King, [0.0, 1.0, 0.0] -> Queen, [0.0, 0.0, 1.0] -> joker.
-Last 3 inputs classify the last action sequence in the game:
+Last 2 inputs classify the last action sequence in the game:
     Action types: {Bet: 1.0, Pass: -1.0, NULL: 0.0}
 */
-pub const NUM_INPUTS: usize = 6;
+pub const NUM_INPUTS: usize = 5;
 pub const NUM_HIDDEN_NODES: usize = 16;
 pub const NUM_OUTPUTS: usize = 1;
 
@@ -39,8 +39,8 @@ pub struct Model {
     pub hidden_layer_bias: [f64; NUM_HIDDEN_NODES],
     pub output_layer_bias: [f64; NUM_OUTPUTS],
 
-    pub hidden_weights: [[f64; NUM_OUTPUTS]; NUM_HIDDEN_NODES],
-    pub output_weights: [[f64; NUM_OUTPUTS]; NUM_OUTPUTS],
+    pub hidden_weights: [[f64; NUM_INPUTS]; NUM_HIDDEN_NODES],
+    pub output_weights: [[f64; NUM_HIDDEN_NODES]; NUM_OUTPUTS],
 }
 
 impl Model {
@@ -50,8 +50,8 @@ impl Model {
             output_layer: [0.0; NUM_OUTPUTS],
             hidden_layer_bias: [0.0; NUM_HIDDEN_NODES],
             output_layer_bias: [0.0; NUM_OUTPUTS],
-            hidden_weights: [[0.0; NUM_OUTPUTS]; NUM_HIDDEN_NODES],
-            output_weights: [[0.0; NUM_OUTPUTS]; NUM_OUTPUTS],
+            hidden_weights: [[0.0; NUM_INPUTS]; NUM_HIDDEN_NODES],
+            output_weights: [[0.0; NUM_HIDDEN_NODES]; NUM_OUTPUTS],
         };
 
         // TODO: optimize
@@ -103,9 +103,8 @@ impl Model {
 
         for i in 0..NUM_OUTPUTS {
             let mut activation = self.output_layer_bias[i];
-
             for j in 0..NUM_HIDDEN_NODES {
-                activation += self.hidden_layer[j] * self.output_weights[j][i];
+                activation += self.hidden_layer[j] * self.output_weights[i][j];
             }
             self.output_layer[i] = sigmoid(activation);
         }
@@ -125,7 +124,7 @@ impl Model {
         for i in 0..NUM_HIDDEN_NODES {
             let mut error = 0.0f64;
             for j in 0..NUM_OUTPUTS {
-                error += delta_output[j] * self.output_weights[i][j];
+                error += delta_output[j] * self.output_weights[j][i];
             }
             delta_hidden[i] = error * d_sigmoid(self.hidden_layer[i]);
         }
@@ -134,14 +133,14 @@ impl Model {
         for i in 0..NUM_OUTPUTS {
             self.output_layer_bias[i] += delta_output[i] * LEARNING_RATE;
             for j in 0..NUM_HIDDEN_NODES {
-                self.output_weights[j][i] += self.hidden_layer[j] * delta_output[i] * LEARNING_RATE;
+                self.output_weights[i][j] += self.hidden_layer[j] * delta_output[i] * LEARNING_RATE;
             }
         }
 
         for i in 0..NUM_HIDDEN_NODES {
             self.hidden_layer_bias[i] += delta_hidden[i] * LEARNING_RATE;
             for j in 0..NUM_INPUTS {
-                self.hidden_weights[j][i] += input[j] * delta_hidden[i] * LEARNING_RATE;
+                self.hidden_weights[i][j] += input[j] * delta_hidden[i] * LEARNING_RATE;
             }
         }
     }
