@@ -88,8 +88,10 @@ enum GameState { // -> next best move
     int chips_p2 = 1;
     GameState end = GameState.NoAction;
     int winner = 0;
+    int start_chips = 10;   // each player starts the hand with 10 chips
 
-System.out.println("Your card is: " + hands_p2);
+System.out.println("\u001B[31m" + "Your card is: " + hands_p2 + "\u001B[0m");
+System.out.println("Chips - You: " + (start_chips - chips_p2) + ", CPU: " + (start_chips - chips_p1) + ", Pot: " + chips_table);
 
 //player 1 (CPU) goes first: it bets with the Joker (1) and checks otherwise
 int choice = 1;
@@ -101,6 +103,7 @@ if (choice == 2){
     System.out.println("Player 1 (CPU) bets.");
     chips_p1 = chips_p1 + 1;
     chips_table = chips_table + 1;
+    System.out.println("Chips - You: " + (start_chips - chips_p2) + ", CPU: " + (start_chips - chips_p1) + ", Pot: " + chips_table);
 
     System.out.println("Type 1 to call, and 2 to fold.");
     int choice2 = in.nextInt();
@@ -112,6 +115,7 @@ if (choice == 2){
         System.out.println("You call.");
         chips_p2 = chips_p2 + 1;
         chips_table = chips_table + 1;
+        System.out.println("Chips - You: " + (start_chips - chips_p2) + ", CPU: " + (start_chips - chips_p1) + ", Pot: " + chips_table);
 
         if (hands_p1 == 3){
             end = GameState.KBetCall;
@@ -154,11 +158,13 @@ if (choice == 2){
         System.out.println("You bet.");
         chips_p2 = chips_p2 + 1;
         chips_table = chips_table + 1;
+        System.out.println("Chips - You: " + (start_chips - chips_p2) + ", CPU: " + (start_chips - chips_p1) + ", Pot: " + chips_table);
 
         if (hands_p1 == 3){
             System.out.println("Player 1 (CPU) calls.");
             chips_p1 = chips_p1 + 1;
             chips_table = chips_table + 1;
+            System.out.println("Chips - You: " + (start_chips - chips_p2) + ", CPU: " + (start_chips - chips_p1) + ", Pot: " + chips_table);
             end = GameState.KCheckBetCall;
         } else {
             System.out.println("Player 1 (CPU) folds.");
@@ -180,9 +186,11 @@ if (winner == 0){
     }
 }
 if (winner == 2){
-    System.out.println("You win " + chips_p1 + "chips.");
+    System.out.println("You win the pot of " + chips_table + " chips (profit: " + chips_p1 + ").");
+    System.out.println("Final chips - You: " + (start_chips - chips_p2 + chips_table) + ", CPU: " + (start_chips - chips_p1));
 } else {
-    System.out.println("Player 1 (CPU) wins " + chips_p2 + "chips.");
+    System.out.println("Player 1 (CPU) wins the pot of " + chips_table + " chips (you lose " + chips_p2 + ").");
+    System.out.println("Final chips - You: " + (start_chips - chips_p2) + ", CPU: " + (start_chips - chips_p1 + chips_table));
 }
 
 
@@ -193,11 +201,6 @@ System.out.println(end);
     
     }
 }
-
-
-
-
-
 
 
 
