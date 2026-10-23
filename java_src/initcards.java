@@ -68,7 +68,12 @@ enum GameState { // -> next best move
     // P1 (CPU) goes first, and they have King, but P2 Joker.
     GameState gameState = node_tree[GameState.KEmpty.ordinal()];
 
+int chips_p1 = 10;   // CPU chips (carried over from hand to hand)
+int chips_p2 = 10;   // your chips (carried over from hand to hand)
+int chips_pot = 0;   // chips in the middle (reset at the start of each hand)
+boolean playing = true;
 
+while (playing){
     int hands_p1 = hands.nextInt(1,4);
 
     int hands_p2 = hands.nextInt(1,4);
@@ -83,17 +88,15 @@ enum GameState { // -> next best move
          //player 1 always starts first
          //cost 1 chip per player per tern, 1 more to bet, 2 in pot.
 
-    int chips_table = 2;
-    int chips_p1 = 1;
-    int chips_p2 = 1;
+    chips_pot = 2;             
+    chips_p1 = chips_p1 - 1;   
+    chips_p2 = chips_p2 - 1;   
     GameState end = GameState.NoAction;
     int winner = 0;
-    int start_chips = 10;   // each player starts the hand with 10 chips
 
-System.out.println("\u001B[31m" + "Your card is: " + hands_p2 + "\u001B[0m");
-System.out.println("Chips - You: " + (start_chips - chips_p2) + ", CPU: " + (start_chips - chips_p1) + ", Pot: " + chips_table);
+System.out.println("\u001B[32m" + "Your card is: " + hands_p2 + "\u001B[0m");
+System.out.println("Chips - You: " + chips_p2 + ", CPU: " + chips_p1 + ", Pot: " + chips_pot);
 
-//player 1 (CPU) goes first: it bets with the Joker (1) and checks otherwise
 int choice = 1;
 if (hands_p1 == 1){
     choice = 2;
@@ -101,9 +104,9 @@ if (hands_p1 == 1){
 
 if (choice == 2){
     System.out.println("Player 1 (CPU) bets.");
-    chips_p1 = chips_p1 + 1;
-    chips_table = chips_table + 1;
-    System.out.println("Chips - You: " + (start_chips - chips_p2) + ", CPU: " + (start_chips - chips_p1) + ", Pot: " + chips_table);
+    chips_p1 = chips_p1 - 1;
+    chips_pot = chips_pot + 1;
+    System.out.println("Chips - You: " + chips_p2 + ", CPU: " + chips_p1 + ", Pot: " + chips_pot);
 
     System.out.println("Type 1 to call, and 2 to fold.");
     int choice2 = in.nextInt();
@@ -113,9 +116,9 @@ if (choice == 2){
     }
     if (choice2 == 1){
         System.out.println("You call.");
-        chips_p2 = chips_p2 + 1;
-        chips_table = chips_table + 1;
-        System.out.println("Chips - You: " + (start_chips - chips_p2) + ", CPU: " + (start_chips - chips_p1) + ", Pot: " + chips_table);
+        chips_p2 = chips_p2 - 1;
+        chips_pot = chips_pot + 1;
+        System.out.println("Chips - You: " + chips_p2 + ", CPU: " + chips_p1 + ", Pot: " + chips_pot);
 
         if (hands_p1 == 3){
             end = GameState.KBetCall;
@@ -156,15 +159,15 @@ if (choice == 2){
         }
     } else {
         System.out.println("You bet.");
-        chips_p2 = chips_p2 + 1;
-        chips_table = chips_table + 1;
-        System.out.println("Chips - You: " + (start_chips - chips_p2) + ", CPU: " + (start_chips - chips_p1) + ", Pot: " + chips_table);
+        chips_p2 = chips_p2 - 1;
+        chips_pot = chips_pot + 1;
+        System.out.println("Chips - You: " + chips_p2 + ", CPU: " + chips_p1 + ", Pot: " + chips_pot);
 
         if (hands_p1 == 3){
             System.out.println("Player 1 (CPU) calls.");
-            chips_p1 = chips_p1 + 1;
-            chips_table = chips_table + 1;
-            System.out.println("Chips - You: " + (start_chips - chips_p2) + ", CPU: " + (start_chips - chips_p1) + ", Pot: " + chips_table);
+            chips_p1 = chips_p1 - 1;
+            chips_pot = chips_pot + 1;
+            System.out.println("Chips - You: " + chips_p2 + ", CPU: " + chips_p1 + ", Pot: " + chips_pot);
             end = GameState.KCheckBetCall;
         } else {
             System.out.println("Player 1 (CPU) folds.");
@@ -186,21 +189,31 @@ if (winner == 0){
     }
 }
 if (winner == 2){
-    System.out.println("You win the pot of " + chips_table + " chips (profit: " + chips_p1 + ").");
-    System.out.println("Final chips - You: " + (start_chips - chips_p2 + chips_table) + ", CPU: " + (start_chips - chips_p1));
+    chips_p2 = chips_p2 + chips_pot;
+    System.out.println("\u001B[34m" + "You win the pot of " + chips_pot + " chips." + "\u001B[0m");
 } else {
-    System.out.println("Player 1 (CPU) wins the pot of " + chips_table + " chips (you lose " + chips_p2 + ").");
-    System.out.println("Final chips - You: " + (start_chips - chips_p2) + ", CPU: " + (start_chips - chips_p1 + chips_table));
+    chips_p1 = chips_p1 + chips_pot;
+    System.out.println("\u001B[31m" + "Player 1 (CPU) wins the pot of " + chips_pot + " chips." + "\u001B[0m");
+}
+System.out.println("Chips - You: " + chips_p2 + ", CPU: " + chips_p1);
+
+System.out.println("Pot: " + chips_pot);
+System.out.println(end);
+
+if (chips_p1 < 2 || chips_p2 < 2){
+    System.out.println("Someone is out of chips. Game over!");
+    playing = false;
 }
 
 
-System.out.println("Pot: " + chips_table);
-System.out.println(end);
 
 
     
     }
 }
+}
+
+
 
 
 
