@@ -261,6 +261,7 @@ fn main() {
                 model.load_model_json("model/kuhn.json");
                 println!("You have a Joker Card.\n Enter your first move as Bet or Check: ");
                 let input: String = input();
+
                 if input.eq_ignore_ascii_case("Bet") {
                     model.forward_pass([1.0, 0.0, 0.0, 1.0, 0.0]);
                     if model.output_layer[0] > 0.0 {
