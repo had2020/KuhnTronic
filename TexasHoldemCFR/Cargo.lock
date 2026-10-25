@@ -8,6 +8,7 @@ version = "0.0.1"
 dependencies = [
  "candle-core",
  "candle-nn",
+ "input_method",
 ]
 
 [[package]]
@@ -575,6 +576,12 @@ dependencies = [
  "equivalent",
  "hashbrown 0.17.1",
 ]
+
+[[package]]
+name = "input_method"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d7c26bec69d1b9c45f25db5620f98d2431ab254eed1adc43f4d4284864d1d5cf"
 
 [[package]]
 name = "itertools"

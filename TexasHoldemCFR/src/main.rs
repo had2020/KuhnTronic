@@ -1,5 +1,49 @@
 use candle_core::{DType, Device, Result, Tensor};
 use candle_nn::{Linear, Module, Optimizer, SGD, VarBuilder, VarMap, linear};
+use input_method::*;
+
+#[repr(usize)]
+pub enum CardNum {
+    Two = 1,
+    Three = 2,
+    Four = 3,
+    Five = 4,
+    Six = 5,
+    Seven = 6,
+    Eight = 7,
+    Nine = 8,
+    Ten = 9,
+    Jack = 10,
+    Queen = 11,
+    King = 12,
+    Ace = 13,
+}
+
+#[repr(usize)]
+pub enum CardSymbol {
+    Clubs = 1,
+    Diamonds = 2,
+    Hearts = 3,
+    Spades = 4,
+}
+
+pub struct CardRep {
+    pub num: CardNum,
+    pub pip: CardSymbol,
+}
+
+impl CardRep {
+    /// First 13 inputs are the flatten card number magnitudes.
+    /// Next are 4 inputs for the Card Symbol magnitudes.
+    pub fn to_f64_buf(self) -> [f64; 17] {
+        let mut r = [0.0; 17];
+
+        r[self.num as usize] = 1.0;
+        r[13 + self.pip as usize] = 1.0;
+
+        return r;
+    }
+}
 
 //https://docs.rs/candle-core/0.11.0/candle_core/
 struct SimpleMLP {
@@ -22,6 +66,15 @@ impl SimpleMLP {
 
 fn main() -> Result<()> {
     let device = Device::Cpu;
+
+    /* TODO! Input Vector
+    Each card takes: 17 elements
+    Up to 5 community cards: 85 elements
+    The Flop: 3 cards
+    The Turn: 1 card
+    The River: 1 card
+
+    */
 
     // XOR
     let x_data: &[f32] = &[0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0];
