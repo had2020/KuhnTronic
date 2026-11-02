@@ -45,6 +45,10 @@ impl CardRep {
     }
 }
 
+// https://en.wikipedia.org/wiki/Standard_52-card_deck
+const FIFTYTWO_CARD_DECK: [CardRep; 52] =
+    { /* TODO: fill with the 52 card desk, to suffle cards  */ };
+
 //https://docs.rs/candle-core/0.11.0/candle_core/
 struct SimpleMLP {
     fc1: Linear,
