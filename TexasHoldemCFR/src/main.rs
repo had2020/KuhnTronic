@@ -2,6 +2,8 @@ use candle_core::{DType, Device, Result, Tensor};
 use candle_nn::{Linear, Module, Optimizer, SGD, VarBuilder, VarMap, linear};
 use input_method::*;
 
+//mod suffle;
+
 #[repr(usize)]
 pub enum CardNum {
     Two = 1,
@@ -47,7 +49,7 @@ impl CardRep {
 
 /* TODO: fill with the 52 card desk, to suffle cards  */
 // https://en.wikipedia.org/wiki/Standard_52-card_deck
-const FIFTYTWO_CARD_DECK: [CardRep; 52] = {};
+//const FIFTYTWO_CARD_DECK: [CardRep; 52] = {};
 
 //https://docs.rs/candle-core/0.11.0/candle_core/
 struct SimpleMLP {
