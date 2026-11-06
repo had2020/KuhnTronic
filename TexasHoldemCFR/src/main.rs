@@ -1,32 +1,30 @@
-use candle_core::{DType, Device, Result, Tensor};
-use candle_nn::{Linear, Module, Optimizer, SGD, VarBuilder, VarMap, linear};
 use input_method::*;
 
 //mod suffle;
 
 #[repr(usize)]
 pub enum CardNum {
-    Two = 1,
-    Three = 2,
-    Four = 3,
-    Five = 4,
-    Six = 5,
-    Seven = 6,
-    Eight = 7,
-    Nine = 8,
-    Ten = 9,
-    Jack = 10,
-    Queen = 11,
-    King = 12,
-    Ace = 13,
+    Two = 0,
+    Three = 1,
+    Four = 2,
+    Five = 3,
+    Six = 4,
+    Seven = 5,
+    Eight = 6,
+    Nine = 7,
+    Ten = 8,
+    Jack = 9,
+    Queen = 10,
+    King = 11,
+    Ace = 12,
 }
 
 #[repr(usize)]
 pub enum CardSymbol {
-    Clubs = 1,
-    Diamonds = 2,
-    Hearts = 3,
-    Spades = 4,
+    Clubs = 0,
+    Diamonds = 1,
+    Hearts = 2,
+    Spades = 3,
 }
 
 pub struct CardRep {
@@ -37,6 +35,17 @@ pub struct CardRep {
 impl CardRep {
     /// First 13 inputs are the flatten card number magnitudes.
     /// Next are 4 inputs for the Card Symbol magnitudes.
+    pub fn to_bit_buf(self) -> [u8; 3] {
+        let mut r: [u8; 3] = [0, 0, 0];
+        let sym_nth = self.num as usize;
+        let sym_nth_byte = (sym_nth / 8) as usize;
+        let pip_nth = self.pip as usize;
+        r[sym_nth_byte] = r[sym_nth >> sym_nth_byte % 8];
+
+        return r;
+    }
+
+    /* Not for discrete models.
     pub fn to_f64_buf(self) -> [f64; 17] {
         let mut r = [0.0; 17];
 
@@ -44,83 +53,97 @@ impl CardRep {
         r[13 + self.pip as usize] = 1.0;
 
         return r;
+    }*/
+}
+
+struct Model {
+    weights0: u8,
+    thresholds0: u8,
+
+    weights1: u8,
+    thresholds1: u8,
+}
+
+impl Model {
+    fn forward(&mut self, inputs: u8) -> u8 {
+        let xnor_result = !(inputs ^ self.weights0);
+
+        // Hardware POPCNT: 1-3 cycles
+        let set_bits = xnor_result.count_ones() as u8;
+
+        // Branchless activation (Thresholding)
+        // If set_bits > threshold, return 1, else 0
+        let layer_out0 = (set_bits > self.thresholds0) as u8;
+
+        let xnor_result1 = !(layer_out0 ^ self.weights1);
+        let set_bits1 = xnor_result1.count_ones() as u8;
+        return (set_bits1 > self.thresholds1) as u8;
     }
 }
+
+const XOR_DATASET: [([u8; 2], u8); 4] = [
+    // ( [x0,  x1 ], expected_y )
+    ([0, 0], 0),
+    ([0, 1], 1),
+    ([1, 0], 1),
+    ([1, 1], 0),
+];
 
 /* TODO: fill with the 52 card desk, to suffle cards  */
 // https://en.wikipedia.org/wiki/Standard_52-card_deck
 //const FIFTYTWO_CARD_DECK: [CardRep; 52] = {};
 
-//https://docs.rs/candle-core/0.11.0/candle_core/
-struct SimpleMLP {
-    fc1: Linear,
-    fc2: Linear,
-}
-
-impl SimpleMLP {
-    fn new(vs: VarBuilder) -> Result<Self> {
-        let fc1 = linear(2, 4, vs.pp("fc1"))?;
-        let fc2 = linear(4, 1, vs.pp("fc2"))?;
-        Ok(Self { fc1, fc2 })
-    }
-
-    fn forward(&self, xs: &Tensor) -> Result<Tensor> {
-        let h = self.fc1.forward(xs)?.relu()?;
-        candle_nn::ops::sigmoid(&self.fc2.forward(&h)?)
-    }
-}
-
-fn main() -> Result<()> {
-    let device = Device::Cpu;
-
+fn main() {
     /* TODO! Input Vector
     Each card takes: 17 elements
     Up to 5 community cards: 85 elements
     The Flop: 3 cards
     The Turn: 1 card
-    The River: 1 card
+    The River: 1 card */
 
-    */
+    let card_num = CardRep {
+        num: CardNum::Two,
+        pip: CardSymbol::Clubs,
+    };
 
-    // XOR
-    let x_data: &[f32] = &[0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0];
-    let y_data: &[f32] = &[0.0, 1.0, 1.0, 0.0];
+    /*
+    let mut model: Model = Model {
+        weights0: 0,
+        thresholds0: 5,
+        weights1: 0,
+        thresholds1: 4,
+    };
 
-    let x = Tensor::from_slice(x_data, (4, 2), &device)?;
-    let y = Tensor::from_slice(y_data, (4, 1), &device)?;
-
-    let varmap = VarMap::new();
-    let vs = VarBuilder::from_varmap(&varmap, DType::F32, &device);
-    let model = SimpleMLP::new(vs)?;
-
-    let mut opt = SGD::new(varmap.all_vars(), 0.5)?;
-
-    for epoch in 0..=500 {
-        let preds = model.forward(&x)?;
-
-        let loss = preds.sub(&y)?.sqr()?.mean_all()?;
-
-        opt.backward_step(&loss)?;
-
-        if epoch % 100 == 0 {
-            let loss_val: f32 = loss.to_scalar()?;
-            println!("Epoch {:3} | Loss: {:.6}", epoch, loss_val);
+    // train
+    for epoch in 0..512 {
+        let row = epoch % 4;
+        while true {
+            let input: [u8; 2] = XOR_DATASET[row].0;
+            let expected = XOR_DATASET[row].1;
+            let vectorized_input = (input[0] << 4) | (input[1] & 0b00001111);
+            let output = model.forward(vectorized_input);
+            if expected == output {
+                break;
+            } else {
+                // mutate some random bits here
+                /*
+                *
+                * impl BinaryLayer {
+                    pub fn update_threshold(&mut self, popcnt_result: u32, target: u64, output: u64) {
+                        if output != target {
+                            if target == 1 {
+                                // False Negative: Neuron needs to fire easier. Lower the bar.
+                                self.threshold = self.threshold.saturating_sub(1);
+                            } else {
+                                // False Positive: Neuron fired too easily. Raise the bar.
+                                self.threshold = self.threshold.saturating_add(1);
+                            }
+                        }
+                    }
+                }
+                */
+            }
         }
     }
-
-    let test_preds = model.forward(&x)?;
-    println!("\nTrained Predictions vs Targets:");
-    for i in 0..4 {
-        let pred: f32 = test_preds.get(i)?.get(0)?.to_scalar()?;
-        let target = y_data[i];
-        println!(
-            "Input: [{:.0}, {:.0}] -> Pred: {:.4} (Target: {:.0})",
-            x_data[i * 2],
-            x_data[i * 2 + 1],
-            pred,
-            target
-        );
-    }
-
-    Ok(())
+    */
 }
